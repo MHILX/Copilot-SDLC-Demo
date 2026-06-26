@@ -115,7 +115,7 @@ This maps the multi-agent design onto Copilot's **native** features — no web s
 | **Developer worker** | Subagent that writes/edits files |
 | **Reviewer worker** | Subagent that reviews code for quality, security, and standards before testing |
 | **QA worker** | Subagent that writes tests, runs them, reports failures |
-| **Shared rules** | `AGENTS.md` / `.instructions.md` with conventions all agents obey |
+| **Shared rules** | `.github/copilot-instructions.md` + `.instructions.md` files with conventions all agents obey (an `AGENTS.md` at the repo root is an equivalent alternative this repo does not use) |
 | **State** | Lives in the conversation + a tracked spec/todo file (no database needed) |
 | **Repeatable kickoffs** | Prompt files (`.prompt.md`) such as "start new feature" |
 | **Test/fix loop** | QA agent runs the suite in the integrated terminal, feeds failures back to the Developer agent |
@@ -136,8 +136,7 @@ All customization lives in the workspace and is committed alongside the code:
 
 ```
 .github/
-  copilot-instructions.md        # Repo-wide conventions all agents obey
-AGENTS.md                        # Shared rules / project context (optional companion)
+  copilot-instructions.md        # Repo-wide conventions all agents obey (this repo's shared-rules file)
 .github/
   agents/
     sdlc-supervisor.agent.md     # Supervisor: owns state machine + delegation
@@ -187,7 +186,7 @@ AGENTS.md                        # Shared rules / project context (optional comp
 - Reports failures back so the Supervisor can route to the Developer agent for a patch.
 
 ### 6.7 Shared rules & prompts
-- `copilot-instructions.md` / `AGENTS.md`: conventions every agent obeys.
+- `copilot-instructions.md`: conventions every agent obeys (this repo's shared-rules file; an `AGENTS.md` at the repo root is an equivalent alternative).
 - `.instructions.md` files scoped via `applyTo` for coding vs. testing standards.
 - `.prompt.md` files for repeatable kickoffs (new feature, fix failing tests).
 
@@ -205,7 +204,7 @@ AGENTS.md                        # Shared rules / project context (optional comp
 
 ## 8. Resources
 
-- **VS Code Copilot customization:** custom agents (`.agent.md`), subagents, instructions (`.instructions.md`), prompt files (`.prompt.md`), and `AGENTS.md` / `copilot-instructions.md`.
+- **VS Code Copilot customization:** custom agents (`.agent.md`), subagents, instructions (`.instructions.md`), prompt files (`.prompt.md`), and `copilot-instructions.md` (or an equivalent `AGENTS.md`).
 - **GitHub Copilot coding agent:** for optional autonomous test-and-fix-via-PR once the repo is on GitHub.
 
 ---

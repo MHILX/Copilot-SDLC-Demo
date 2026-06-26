@@ -58,6 +58,9 @@ Copilot-SDLC-Demo/
 │     └─ fix-failing-tests.prompt.md
 ├─ docs/
 │  └─ spec.md                       ← tracked project state / source of truth
+├─ scripts/
+│  ├─ scaffold-sdlc.ps1             ← copy customization into a target repo (PowerShell)
+│  └─ scaffold-sdlc.sh              ← copy customization into a target repo (Bash)
 ├─ src/                             ← (empty) where the Developer agent writes code
 │  └─ .gitkeep
 └─ tests/                           ← (empty) where the QA agent writes tests
@@ -88,6 +91,29 @@ Or jump straight to a step with a prompt: type `/` in chat and pick
 
 To follow this SDLC process in a new or existing repo, copy the customization
 files into it:
+
+### Quick scaffold (script)
+
+From a clone of this repo, run the script for your shell and point it at a target
+folder. It copies the whole `.github` customization and `docs/spec.md`, then
+ensures `src/` and `tests/` exist:
+
+```powershell
+# Windows / PowerShell
+./scripts/scaffold-sdlc.ps1 -Target ../my-project
+```
+
+```bash
+# macOS / Linux / WSL
+./scripts/scaffold-sdlc.sh ../my-project
+```
+
+The scripts copy directories wholesale (not a hard-coded file list), so they stay
+correct as agents are added or renamed. They prompt before overwriting existing
+files — pass `-Force` (PowerShell) or `--force` (Bash) to skip the prompts. Run
+them from a clone of this repo, not an empty folder.
+
+### Manual copy
 
 1. Copy these into the root of your repo, preserving paths:
    - `.github/copilot-instructions.md`
@@ -125,3 +151,40 @@ locally.
 
 > These files are illustrative scaffolding. Adjust tool sets, models, default
 > tech stacks, and test frameworks to fit your real project.
+
+## Anatomy of an agent file
+
+Each agent lives in `.github/agents/<name>.agent.md`: YAML frontmatter (its
+configuration) followed by a Markdown body (its system prompt). Recreating these
+from scratch requires getting the frontmatter right, so the fields are:
+
+| Field | Purpose |
+|-------|---------|
+| `name` | Display name shown in the chat agent picker. |
+| `description` | When to use the agent; how the Supervisor (and VS Code) decide to route to it. |
+| `tools` | The capabilities the agent may use. Keep this minimal — it is the agent's permission boundary. |
+| `model` | Ordered list of acceptable models (first available is used). |
+| `user-invocable` | `false` for workers so users don't call them directly — only the Supervisor delegates to them. Omitted on the Supervisor, which is the entry point. |
+| `agents` | (Supervisor only) the subagents it is allowed to delegate to. |
+| `argument-hint` | (Supervisor only) placeholder text for the user's first message. |
+
+### Tool grants (and why)
+
+Tools are deliberately scoped so each agent can only do its job. This is a key
+part of the design — for example, the Reviewer cannot edit code, which keeps
+review and implementation separate.
+
+| Agent | `tools` | Why |
+|-------|---------|-----|
+| `sdlc-supervisor` | `read, search, edit, todo, agent` | Coordinates only: reads/updates `docs/spec.md` (`edit`), tracks phases (`todo`), and delegates (`agent`). No `execute` — it never runs code itself. |
+| `pm` | `read, edit, search` | Writes requirements into `docs/spec.md`; no code or test execution. |
+| `architect` | `read, edit, search` | Writes the plan into `docs/spec.md`; no code or test execution. |
+| `developer` | `read, edit, search, execute` | Writes files under `src/` and may run a command to verify a fix. |
+| `reviewer` | `read, search` | Review-only: can read code but **cannot** edit or execute, enforcing the review/implementation split. |
+| `qa` | `read, edit, search, execute` | Writes tests under `tests/` and runs the suite in the terminal (`execute`). |
+
+> All workers set `user-invocable: false`; only `sdlc-supervisor` is invoked
+> directly. The shared rules in
+> [.github/copilot-instructions.md](.github/copilot-instructions.md) apply to every
+> agent (an `AGENTS.md` at the repo root is an equivalent alternative this repo
+> does not use).
