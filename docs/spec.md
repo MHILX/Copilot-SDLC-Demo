@@ -6,7 +6,7 @@
 
 `GATHERING_REQS`
 
-<!-- One of: GATHERING_REQS | PLANNING | CODING | TESTING | DONE -->
+<!-- One of: GATHERING_REQS | PLANNING | CODING | REVIEW | TESTING | DONE -->
 
 ---
 
@@ -52,6 +52,12 @@ tests/
 _(Architect — ordered files/modules, each mapped to the requirement(s) it satisfies. Developer checks items off.)_
 
 - [ ]
+
+---
+
+## Review Findings
+
+_(Reviewer — verdict (Approved / Changes requested) and any actionable findings: file, issue, suggested fix.)_
 
 ---
 

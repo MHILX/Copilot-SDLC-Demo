@@ -1,10 +1,10 @@
 # Project Guidelines
 
-These rules apply to every agent in this workspace (Supervisor, PM, Architect, Developer, QA).
+These rules apply to every agent in this workspace (Supervisor, PM, Architect, Developer, Reviewer, QA).
 
 ## Workflow
 
-- The project moves through a state machine: `GATHERING_REQS → PLANNING → CODING → TESTING`.
+- The project moves through a state machine: `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`.
 - [docs/spec.md](../docs/spec.md) is the single source of truth for requirements, plan, and current state. Keep it updated as work progresses.
 - Do not skip ahead: code is only written after requirements are clear and a plan exists.
 

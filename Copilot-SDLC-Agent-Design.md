@@ -41,6 +41,7 @@ Splitting the problem into specialized roles produces better, more focused resul
 | **Product Manager (PM)** | Requirement gathering, scope definition, clarifying questions |
 | **Architect** | Turns finalized requirements into file structure, implementation map, and tech-stack decisions |
 | **Developer** | Writes/edits files, produces clean code |
+| **Reviewer** | Reviews the Developer's code for quality, security, and standards adherence before testing |
 | **QA / Tester** | Writes unit tests, reviews edge cases, runs tests, reports failures |
 
 ### Supervisor / Worker pattern
@@ -48,7 +49,7 @@ Splitting the problem into specialized roles produces better, more focused resul
 The user interacts only with the **Supervisor**. The Supervisor tracks overall project **state** and routes the task to the right worker:
 
 ```
-State: GATHERING_REQS  →  PLANNING  →  CODING  →  TESTING  →  (loop back as needed)
+State: GATHERING_REQS  →  PLANNING  →  CODING  →  REVIEW  →  TESTING  →  (loop back as needed)
 ```
 
 ```
@@ -70,8 +71,15 @@ State: GATHERING_REQS  →  PLANNING  →  CODING  →  TESTING  →  (loop back
 │ Implement Code Blocks│
 └──────┬───────────────┘
        ▼
-┌──────────────────────┐
-│ QA Agent:            │
+┌──────────────────────┐│ Reviewer Agent:      │
+│ Review Code Quality  │
+└──────┬──────────────┘
+       │ Changes requested
+       ▼
+   (back to Developer Agent for a patch)
+       │ Approved
+       ▼
+┌──────────────────────┐│ QA Agent:            │
 │ Write & Run Tests    │
 └──────┬───────────────┘
        │ Fail
@@ -101,10 +109,11 @@ This maps the multi-agent design onto Copilot's **native** features — no web s
 
 | Design concept | Implementation |
 |----------------|----------------|
-| **Supervisor** | A custom agent (`.agent.md`) that owns the state machine (`GATHERING_REQS → PLANNING → CODING → TESTING`) and delegates |
+| **Supervisor** | A custom agent (`.agent.md`) that owns the state machine (`GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`) and delegates |
 | **PM worker** | Subagent for requirements / clarifying questions |
 | **Architect worker** | Subagent for file structure + tech-stack spec |
 | **Developer worker** | Subagent that writes/edits files |
+| **Reviewer worker** | Subagent that reviews code for quality, security, and standards before testing |
 | **QA worker** | Subagent that writes tests, runs them, reports failures |
 | **Shared rules** | `AGENTS.md` / `.instructions.md` with conventions all agents obey |
 | **State** | Lives in the conversation + a tracked spec/todo file (no database needed) |
@@ -135,6 +144,7 @@ AGENTS.md                        # Shared rules / project context (optional comp
     pm.agent.md                  # PM worker: requirements & clarifying questions
     architect.agent.md           # Architect worker: spec + file structure + stack
     developer.agent.md           # Developer worker: writes/edits files
+    reviewer.agent.md            # Reviewer worker: reviews code quality & security
     qa.agent.md                  # QA worker: writes & runs tests, reports failures
   instructions/
     coding-standards.instructions.md   # applyTo code files
@@ -151,7 +161,7 @@ AGENTS.md                        # Shared rules / project context (optional comp
 ## 6. Components to Build
 
 ### 6.1 Supervisor agent
-- Owns the state machine: `GATHERING_REQS → PLANNING → CODING → TESTING`.
+- Owns the state machine: `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`.
 - Decides which worker to delegate to based on current state and user input.
 - Maintains a tracked spec/todo file as the source of truth for project state.
 
@@ -167,12 +177,16 @@ AGENTS.md                        # Shared rules / project context (optional comp
 - Implements/edits files according to the Architect's plan.
 - Produces clean, idiomatic code; makes only the changes required.
 
-### 6.5 QA agent
+### 6.5 Reviewer agent
+- Reviews the Developer's code against the coding standards and security (OWASP Top 10) concerns.
+- Checks spec fidelity and maintainability; approves or routes specific change requests back to the Developer via the Supervisor.
+
+### 6.6 QA agent
 - Writes unit tests and covers edge cases.
 - Runs the test suite in the integrated terminal.
 - Reports failures back so the Supervisor can route to the Developer agent for a patch.
 
-### 6.6 Shared rules & prompts
+### 6.7 Shared rules & prompts
 - `copilot-instructions.md` / `AGENTS.md`: conventions every agent obeys.
 - `.instructions.md` files scoped via `applyTo` for coding vs. testing standards.
 - `.prompt.md` files for repeatable kickoffs (new feature, fix failing tests).

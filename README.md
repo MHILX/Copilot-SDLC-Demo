@@ -10,6 +10,7 @@ It implements the **Supervisor / Worker** multi-agent pattern described in
    ├── pm          → gather & clarify requirements
    ├── architect   → spec, file structure, tech stack
    ├── developer   → write / edit code
+   ├── reviewer    → review code for quality & security
    └── qa          → write & run tests, report failures
 ```
 
@@ -27,9 +28,10 @@ rather than running unattended.
 | Requirements | **PM** | Goal, requirements, acceptance criteria, out-of-scope |
 | Plan | **Architect** | Tech stack, file structure, implementation plan |
 | Code | **Developer** | Checks off plan items as files land in `src/` |
+| Review | **Reviewer** | Review verdict and findings; changes loop back to Developer |
 | Test & Fix | **QA** | Test command and results; failures loop back to Developer |
 
-The **Supervisor** owns the `GATHERING_REQS → PLANNING → CODING → TESTING` state
+The **Supervisor** owns the `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING` state
 machine and routes work to the right agent. For the full rationale (why split the
 work, and why Copilot customization over a backend), see
 [Copilot-SDLC-Agent-Design.md](Copilot-SDLC-Agent-Design.md).
@@ -46,6 +48,7 @@ Copilot-SDLC-Demo/
 │  │  ├─ pm.agent.md                ← PM worker (subagent)
 │  │  ├─ architect.agent.md         ← Architect worker (subagent)
 │  │  ├─ developer.agent.md         ← Developer worker (subagent)
+│  │  ├─ reviewer.agent.md          ← Reviewer worker (subagent)
 │  │  └─ qa.agent.md                ← QA worker (subagent)
 │  ├─ instructions/
 │  │  ├─ coding-standards.instructions.md     ← applyTo source files
@@ -75,7 +78,7 @@ Copilot-SDLC-Demo/
 2. In Copilot Chat, select the **`sdlc-supervisor`** agent (or type `@sdlc-supervisor`).
 3. Describe what you want to build, e.g. *"Build a todo REST API."*
 4. The supervisor walks the project through
-   `GATHERING_REQS → PLANNING → CODING → TESTING`, delegating to each worker and
+   `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`, delegating to each worker and
    keeping [docs/spec.md](docs/spec.md) up to date as the single source of truth.
 
 Or jump straight to a step with a prompt: type `/` in chat and pick
@@ -88,7 +91,7 @@ files into it:
 
 1. Copy these into the root of your repo, preserving paths:
    - `.github/copilot-instructions.md`
-   - `.github/agents/` (all five `.agent.md` files)
+   - `.github/agents/` (all six `.agent.md` files)
    - `.github/instructions/` (both `.instructions.md` files)
    - `.github/prompts/` (both `.prompt.md` files)
    - `docs/spec.md`
