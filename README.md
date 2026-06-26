@@ -3,7 +3,7 @@
 A reference workspace showing how to build an **end-to-end SDLC experience** using only GitHub Copilot's native customization features — no backend service, no webhooks.
 
 It implements the **Supervisor / Worker** multi-agent pattern described in
-[Copilot-SDLC-Agent-Design.md](../Copilot-SDLC-Agent-Design.md):
+[Copilot-SDLC-Agent-Design.md](Copilot-SDLC-Agent-Design.md):
 
 ```
 @sdlc-supervisor  (entry point, owns the state machine)
