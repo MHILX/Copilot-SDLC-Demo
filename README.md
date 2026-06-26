@@ -41,6 +41,8 @@ work, and why Copilot customization over a backend), see
 ```
 Copilot-SDLC-Demo/
 ├─ README.md                        ← this file
+├─ LICENSE                          ← MIT license
+├─ .gitignore
 ├─ .github/
 │  ├─ copilot-instructions.md       ← shared rules every agent obeys
 │  ├─ agents/
@@ -188,3 +190,7 @@ review and implementation separate.
 > [.github/copilot-instructions.md](.github/copilot-instructions.md) apply to every
 > agent (an `AGENTS.md` at the repo root is an equivalent alternative this repo
 > does not use).
+
+## License
+
+MIT — see [LICENSE](LICENSE). The customization files are examples; reuse and adapt them freely.

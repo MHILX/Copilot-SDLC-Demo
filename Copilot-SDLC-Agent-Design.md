@@ -2,7 +2,7 @@
 
 A design and planning document for orchestrating requirement gathering, planning, coding, testing, and bug-fixing through a multi-agent setup built entirely on **GitHub Copilot's native customization features** (custom agents, subagents, instructions, and prompt files).
 
-> **Status:** Design only. No implementation has been started.
+> **Status:** Implemented. The customization files described here live in this repo (see [README.md](README.md)).
 > **Chosen approach:** Copilot customization (in-editor, no backend service).
 > **Last updated:** 2026-06-26
 
@@ -197,7 +197,7 @@ All customization lives in the workspace and is committed alongside the code:
 1. **QA agent** runs the test suite in the integrated terminal.
 2. On failure, it captures the error output and reports it to the **Supervisor**.
 3. The Supervisor routes the failure to the **Developer agent** to issue a patch.
-4. Loop repeats (`CODING → TESTING`) until tests pass.
+4. Loop repeats (`CODING → REVIEW → TESTING`) until tests pass.
 5. **Optional full autonomy:** push to GitHub and assign the issue to the **Copilot coding agent**, which opens a PR, lets CI run, and iterates on fixes.
 
 ---
@@ -209,10 +209,11 @@ All customization lives in the workspace and is committed alongside the code:
 
 ---
 
-## 9. Open Decisions (To Confirm Before Implementation)
+## 9. Resolved Decisions
 
-- [ ] Target tech stacks the Architect/Developer agents should default to.
-- [ ] Test framework(s) the QA agent should standardize on.
-- [ ] Where the tracked spec/state file should live (e.g., `docs/spec.md`).
-- [ ] Whether to wire in the GitHub Copilot coding agent for autonomous PR fixes.
-- [ ] Confirm current folder conventions for agents/instructions/prompts against the docs.
+- [x] The tracked spec/state file lives at `docs/spec.md`.
+- [x] Folder conventions: agents in `.github/agents/`, instructions in `.github/instructions/`, prompts in `.github/prompts/`.
+- [x] A `REVIEW` phase and Reviewer agent sit between `CODING` and `TESTING`.
+- [ ] Target tech stacks the Architect/Developer agents should default to (left to each project).
+- [ ] Test framework(s) the QA agent should standardize on (left to each project).
+- [ ] Whether to wire in the GitHub Copilot coding agent for autonomous PR fixes (optional, per project).
