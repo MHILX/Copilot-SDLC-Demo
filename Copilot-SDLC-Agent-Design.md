@@ -13,10 +13,11 @@ A design and planning document for orchestrating requirement gathering, planning
 Create a Copilot-driven experience that walks a project through the full software development lifecycle (SDLC):
 
 1. **Gather requirements** (clarify scope, ask questions)
-2. **Plan** (architecture, file structure, tech stack)
-3. **Write code** (implement files)
-4. **Test** (unit tests, edge cases)
-5. **Fix bugs** (cyclic feedback loop: code → test → fail → fix)
+2. **Design** (user flows, screen states, accessibility — frontend projects only)
+3. **Plan** (architecture, file structure, tech stack)
+4. **Write code** (implement files)
+5. **Test** (unit tests, edge cases)
+6. **Fix bugs** (cyclic feedback loop: code → test → fail → fix)
 
 ---
 
@@ -39,6 +40,7 @@ Splitting the problem into specialized roles produces better, more focused resul
 | Agent | Responsibility |
 |-------|----------------|
 | **Product Manager (PM)** | Requirement gathering, scope definition, clarifying questions |
+| **Designer (UI/UX)** | *(Frontend projects only)* Turns requirements into user flows, screen states, layout, design tokens, and accessibility requirements |
 | **Architect** | Turns finalized requirements into file structure, implementation map, and tech-stack decisions |
 | **Developer** | Writes/edits files, produces clean code |
 | **Reviewer** | Reviews the Developer's code for quality, security, and standards adherence before testing |
@@ -49,8 +51,10 @@ Splitting the problem into specialized roles produces better, more focused resul
 The user interacts only with the **Supervisor**. The Supervisor tracks overall project **state** and routes the task to the right worker:
 
 ```
-State: GATHERING_REQS  →  PLANNING  →  CODING  →  REVIEW  →  TESTING  →  (loop back as needed)
+State: GATHERING_REQS  →  [DESIGN]  →  PLANNING  →  CODING  →  REVIEW  →  TESTING  →  (loop back as needed)
 ```
+
+`DESIGN` is optional and runs only for frontend or UI-heavy projects; non-UI projects skip from `GATHERING_REQS` straight to `PLANNING`.
 
 ```
 [User Input]
@@ -61,6 +65,14 @@ State: GATHERING_REQS  →  PLANNING  →  CODING  →  REVIEW  →  TESTING  �
 └──────┬───────┘              │ Ask clarifying question │
        │ Yes                  └─────────────────────────┘
        ▼
+┌──────────────────────┐   frontend only
+│ UI-heavy project?    ├──────────────┐
+└──────┬───────────────┘              ▼
+       │ no UI            ┌──────────────────────┐
+       │                 │ Designer Agent:       │
+       │                 │ Flows, states, a11y   │
+       │                 └──────┬───────────────┘
+       ▼◄───────────────────────┘
 ┌──────────────────────┐
 │ Architect Agent:     │
 │ Create Spec & Files  │
@@ -111,6 +123,7 @@ This maps the multi-agent design onto Copilot's **native** features — no web s
 |----------------|----------------|
 | **Supervisor** | A custom agent (`.agent.md`) that owns the state machine (`GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`) and delegates |
 | **PM worker** | Subagent for requirements / clarifying questions |
+| **Designer worker** | Subagent for UI/UX flows, screen states, and accessibility (frontend projects only) |
 | **Architect worker** | Subagent for file structure + tech-stack spec |
 | **Developer worker** | Subagent that writes/edits files |
 | **Reviewer worker** | Subagent that reviews code for quality, security, and standards before testing |
@@ -141,12 +154,14 @@ All customization lives in the workspace and is committed alongside the code:
   agents/
     sdlc-supervisor.agent.md     # Supervisor: owns state machine + delegation
     pm.agent.md                  # PM worker: requirements & clarifying questions
+    designer.agent.md            # Designer worker: UI/UX flows, states, accessibility (frontend only)
     architect.agent.md           # Architect worker: spec + file structure + stack
     developer.agent.md           # Developer worker: writes/edits files
     reviewer.agent.md            # Reviewer worker: reviews code quality & security
     qa.agent.md                  # QA worker: writes & runs tests, reports failures
   instructions/
     coding-standards.instructions.md   # applyTo code files
+    frontend-ux.instructions.md        # applyTo UI source files
     testing-standards.instructions.md  # applyTo test files
   prompts/
     start-new-feature.prompt.md  # Repeatable kickoff
@@ -167,27 +182,33 @@ All customization lives in the workspace and is committed alongside the code:
 ### 6.2 PM agent
 - Gathers and clarifies requirements.
 - Asks targeted questions until scope is clear; writes finalized requirements to the spec file.
+- Routes to the Designer (frontend projects) or straight to the Architect (non-UI projects).
 
-### 6.3 Architect agent
-- Converts finalized requirements into a file structure, implementation map, and tech-stack decisions.
+### 6.3 Designer agent *(frontend projects only)*
+- Converts finalized requirements into user flows, screen states, layout, design tokens, and accessibility requirements.
+- Writes a **Design** section to the spec file that the Architect and Developer build against; chooses no frameworks or file structure.
+
+### 6.4 Architect agent
+- Converts finalized requirements (and the Design section, if present) into a file structure, implementation map, and tech-stack decisions.
 - Produces the plan the Developer agent will follow.
 
-### 6.4 Developer agent
+### 6.5 Developer agent
 - Implements/edits files according to the Architect's plan.
 - Produces clean, idiomatic code; makes only the changes required.
 
-### 6.5 Reviewer agent
+### 6.6 Reviewer agent
 - Reviews the Developer's code against the coding standards and security (OWASP Top 10) concerns.
+- For UI code, checks the implementation against the Design section and the frontend UX & accessibility standards.
 - Checks spec fidelity and maintainability; approves or routes specific change requests back to the Developer via the Supervisor.
 
-### 6.6 QA agent
+### 6.7 QA agent
 - Writes unit tests and covers edge cases.
 - Runs the test suite in the integrated terminal.
 - Reports failures back so the Supervisor can route to the Developer agent for a patch.
 
-### 6.7 Shared rules & prompts
+### 6.8 Shared rules & prompts
 - `copilot-instructions.md`: conventions every agent obeys (this repo's shared-rules file; an `AGENTS.md` at the repo root is an equivalent alternative).
-- `.instructions.md` files scoped via `applyTo` for coding vs. testing standards.
+- `.instructions.md` files scoped via `applyTo` for coding, frontend UX, and testing standards.
 - `.prompt.md` files for repeatable kickoffs (new feature, fix failing tests).
 
 ---

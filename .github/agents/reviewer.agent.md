@@ -19,6 +19,7 @@ You are the **Code Reviewer**. You judge the quality of the Developer's implemen
 2. Read the implemented files under `src/`.
 3. Review against:
    - **Coding standards** in `.github/instructions/coding-standards.instructions.md`.
+   - **Frontend UX & accessibility** in `.github/instructions/frontend-ux.instructions.md` — for UI files, confirm the code implements the **Design** section (screen states, tokens, responsive behavior) and meets the accessibility targets.
    - **Security** — the OWASP Top 10 concerns (injection, secrets, input validation at boundaries, etc.).
    - **Spec fidelity** — every file traces to a plan item; the plan is fully implemented; no scope creep.
    - **Maintainability** — clear names, small functions, business logic separated from I/O, no dead code or leftover TODOs.
