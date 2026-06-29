@@ -8,6 +8,12 @@
 
 <!-- One of: GATHERING_REQS | DESIGN | PLANNING | CODING | REVIEW | TESTING | DONE -->
 
+## Review Cycle
+
+`0`
+
+<!-- Hard cap: 3. Incremented by the Supervisor each time Reviewer requests changes. Reset to 0 on approval. At 3, escalate to the user instead of looping again. -->
+
 ---
 
 ## Goal

@@ -33,6 +33,28 @@ product has a user interface.
 | failure in `TESTING` | `developer` (patch) → `qa` (re-run) | Tests pass |
 | `DONE` | — | Summarize and stop |
 
+### Review Cycle Loop-Breaker
+
+The REVIEW → CODING → REVIEW loop has a **hard cap of 3 cycles**. Track cycles in the `Review Cycle` field of `docs/spec.md`:
+
+1. **Before each REVIEW phase**, read the current `Review Cycle` count. If it is absent, initialize it to `0`.
+2. **When the Reviewer requests changes**, increment `Review Cycle` by 1 before routing to the Developer.
+3. **If `Review Cycle` reaches 3** and the Reviewer still requests changes:
+   - Do NOT route back to the Developer.
+   - Set `Current State` to `GATHERING_REQS`.
+   - Summarize the unresolved Reviewer findings and ask the user: *"After 3 review cycles, the following issues remain unresolved. Would you like to adjust the requirements, override and approve, or take over manually?"*
+   - Wait for the user's decision before proceeding.
+4. **When the Reviewer approves**, reset `Review Cycle` to `0` and proceed to `TESTING`.
+
+### Drift Detection
+
+Before entering `CODING` or `REVIEW`, instruct the subagent to perform a **drift check**: compare the `Implementation Plan` checklist in `docs/spec.md` against the actual files present in `src/`. The subagent must report:
+- Files in `src/` that are NOT in the plan (possible scope creep or manual edits).
+- Plan items that have NO corresponding file in `src/` (incomplete implementation).
+- Files whose names or locations differ from the plan.
+
+If drift is detected during `CODING`, the Developer reconciles it before writing new code. If drift is detected during `REVIEW`, the Reviewer flags it as a finding and routes back to the Developer.
+
 ## Approach
 
 1. Read `docs/spec.md` to determine the current state. If it doesn't exist, start at `GATHERING_REQS`.
