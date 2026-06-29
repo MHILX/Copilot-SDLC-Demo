@@ -15,6 +15,31 @@ It implements the **Supervisor / Worker** multi-agent pattern described in
    └── qa          → write & run tests, report failures
 ```
 
+## Loop Engineering — the design philosophy
+
+This workspace is built on **loop engineering**: the practice of designing a
+system that prompts your agents for you, rather than prompting them turn by turn
+yourself. A well-engineered loop discovers work, hands tasks to agents, verifies
+results, persists state, and decides the next action — on a schedule or until a
+goal is met — while you stay in control of anything irreversible.
+
+### The five pieces of a loop (and how we implement them)
+
+| Piece | What it means | Our implementation |
+|---|---|---|
+| **Automations** | Work that runs on a schedule, discovers and triages without you | The SDLC Supervisor state machine advances phases automatically; prompts like `start-new-feature` and `fix-failing-tests` kick off loops |
+| **Worktrees** | Parallel agents isolated so they don't collide | Each subagent works in its own bounded phase with a clean context; the scope audit prevents cross-domain contamination |
+| **Skills** | Project knowledge written down once, read by every agent | `.github/instructions/` files codify coding standards, UX rules, testing standards, scope audit, and deployment readiness |
+| **Sub-agents** | One agent ideates or implements; a different one checks the work | PM → Architect → Developer → Reviewer → QA chain ensures no agent grades its own output |
+| **State file** | Memory that survives between runs, outside any single conversation | `docs/spec.md` is the version-controlled source of truth tracking phase, requirements, plan, findings, and test results |
+
+The same pattern appears across the industry — automations for heartbeat,
+worktrees for isolation, skills for compounding knowledge, sub-agents for the
+maker/checker split, and a state file as the spine. The names vary but the
+architecture is the same.
+
+---
+
 ## How the SDLC maps to AI agents
 
 The classic software development lifecycle is run by a team of specialized AI
