@@ -6,7 +6,7 @@
 
 `GATHERING_REQS`
 
-<!-- One of: GATHERING_REQS | DESIGN | PLANNING | CODING | REVIEW | TESTING | DONE -->
+<!-- One of: GATHERING_REQS | DESIGN | PLANNING | CODING | REVIEW | TESTING | DEPLOYMENT_READINESS | DONE -->
 
 ## Review Cycle
 
@@ -76,3 +76,18 @@ _(Reviewer — verdict (Approved / Changes requested) and any actionable finding
 ## Test Results
 
 _(QA — latest test command, pass/fail counts, and any failures with error output.)_
+
+---
+
+## Deployment Readiness
+
+_(Reviewer — optional pre-deployment gate. Checklist results per `.github/instructions/deployment-readiness.instructions.md`: build, tests, secrets, config, deps, cleanup. All must PASS before DONE.)_
+
+| # | Check | Status | Detail |
+|---|-------|--------|--------|
+| 1 | Build   | ⬜ | |
+| 2 | Tests   | ⬜ | |
+| 3 | Secrets | ⬜ | |
+| 4 | Config  | ⬜ | |
+| 5 | Deps    | ⬜ | |
+| 6 | Cleanup | ⬜ | |

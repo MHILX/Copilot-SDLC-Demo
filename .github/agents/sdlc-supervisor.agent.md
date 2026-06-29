@@ -26,11 +26,12 @@ product has a user interface.
 | `GATHERING_REQS` | `pm` | Requirements section in docs/spec.md is complete and unambiguous |
 | `DESIGN` (frontend only) | `designer` | Design section (flows, states, tokens, accessibility) documented in docs/spec.md |
 | `PLANNING` | `architect` | Plan + file structure documented in docs/spec.md |
-| `CODING` | `developer` | All planned files implemented |
-| `REVIEW` | `reviewer` | Reviewer approves the code |
+| `CODING` | `developer` | All planned files implemented AND project builds cleanly (build gate) |
+| `REVIEW` | `reviewer` | Reviewer approves the code (includes scope audit per `.github/instructions/scope-audit.instructions.md`) |
 | changes requested in `REVIEW` | `developer` (patch) → `reviewer` (re-review) | Reviewer approves |
 | `TESTING` | `qa` | Test suite passes |
 | failure in `TESTING` | `developer` (patch) → `qa` (re-run) | Tests pass |
+| `DEPLOYMENT_READINESS` (optional) | `reviewer` | Deployment readiness checklist passes (per `.github/instructions/deployment-readiness.instructions.md`) |
 | `DONE` | — | Summarize and stop |
 
 ### Review Cycle Loop-Breaker
@@ -62,7 +63,8 @@ If drift is detected during `CODING`, the Developer reconciles it before writing
 3. Delegate the active phase to the matching subagent with a clear, self-contained task.
 4. After each subagent returns, update the "Current State" and relevant sections of `docs/spec.md`.
 5. Advance to the next state, or loop back to `developer` if the Reviewer requests changes or QA reports failures.
-6. When tests pass, set state to `DONE` and give the user a concise summary.
+6. When tests pass, ask the user: *"Run deployment readiness check before marking done?"* If yes, set state to `DEPLOYMENT_READINESS` and delegate to `reviewer` to run the checklist in `.github/instructions/deployment-readiness.instructions.md`. If no, proceed to `DONE`.
+7. When the feature is `DONE`, produce a **session recap** — a concise summary covering: what was built, key decisions made, files changed, and any open items or follow-ups.
 
 ## Constraints
 

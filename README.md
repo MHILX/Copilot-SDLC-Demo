@@ -29,13 +29,15 @@ rather than running unattended.
 | Requirements | **PM** | Goal, requirements, acceptance criteria, out-of-scope |
 | Design (frontend only) | **Designer** | Screens & flows, states, design tokens, accessibility |
 | Plan | **Architect** | Tech stack, file structure, implementation plan |
-| Code | **Developer** | Checks off plan items as files land in `src/` |
-| Review | **Reviewer** | Review verdict and findings; changes loop back to Developer |
+| Code | **Developer** | Checks off plan items as files land in `src/`; verifies build |
+| Review | **Reviewer** | Review verdict, scope audit, and findings; changes loop back to Developer |
 | Test & Fix | **QA** | Test command and results; failures loop back to Developer |
+| Deployment Readiness _(optional)_ | **Reviewer** | Pre-deploy checklist: build, tests, secrets, config, deps, cleanup |
 
-The **Supervisor** owns the `GATHERING_REQS → [DESIGN] → PLANNING → CODING → REVIEW → TESTING` state
+The **Supervisor** owns the `GATHERING_REQS → [DESIGN] → PLANNING → CODING → REVIEW → TESTING → [DEPLOYMENT_READINESS] → DONE` state
 machine and routes work to the right agent. The optional `DESIGN` phase runs only
-for frontend or UI-heavy projects. For the full rationale (why split the
+for frontend or UI-heavy projects. `DEPLOYMENT_READINESS` is an optional pre-merge
+gate that validates build, security, and configuration before marking the feature done. For the full rationale (why split the
 work, and why Copilot customization over a backend), see
 [Copilot-SDLC-Agent-Design.md](Copilot-SDLC-Agent-Design.md).
 
@@ -59,10 +61,13 @@ Copilot-SDLC-Demo/
 │  ├─ instructions/
 │  │  ├─ coding-standards.instructions.md     ← applyTo source files
 │  │  ├─ frontend-ux.instructions.md          ← applyTo UI source files
-│  │  └─ testing-standards.instructions.md    ← applyTo test files
+│  │  ├─ testing-standards.instructions.md    ← applyTo test files
+│  │  ├─ scope-audit.instructions.md          ← blast-radius checker
+│  │  └─ deployment-readiness.instructions.md ← pre-deploy security & build checklist
 │  └─ prompts/
 │     ├─ start-new-feature.prompt.md
-│     └─ fix-failing-tests.prompt.md
+│     ├─ fix-failing-tests.prompt.md
+│     └─ handoff.prompt.md                    ← agent-to-agent orientation prompt
 ├─ docs/
 │  └─ spec.md                       ← tracked project state / source of truth
 ├─ scripts/
@@ -88,8 +93,9 @@ Copilot-SDLC-Demo/
 2. In Copilot Chat, select the **`sdlc-supervisor`** agent (or type `@sdlc-supervisor`).
 3. Describe what you want to build, e.g. *"Build a todo REST API."*
 4. The supervisor walks the project through
-   `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`, delegating to each worker and
-   keeping [docs/spec.md](docs/spec.md) up to date as the single source of truth.
+   `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING → [DEPLOYMENT_READINESS] → DONE`,
+   delegating to each worker and keeping [docs/spec.md](docs/spec.md) up to date as the
+   single source of truth.
 
 Or jump straight to a step with a prompt: type `/` in chat and pick
 **start-new-feature** or **fix-failing-tests**.
