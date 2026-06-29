@@ -8,6 +8,7 @@ It implements the **Supervisor / Worker** multi-agent pattern described in
 ```
 @sdlc-supervisor  (entry point, owns the state machine)
    ├── pm          → gather & clarify requirements
+   ├── designer    → user flows, states & accessibility (frontend only)
    ├── architect   → spec, file structure, tech stack
    ├── developer   → write / edit code
    ├── reviewer    → review code for quality & security
@@ -26,13 +27,15 @@ rather than running unattended.
 | SDLC phase | Agent | Writes to `docs/spec.md` |
 |------------|-------|--------------------------|
 | Requirements | **PM** | Goal, requirements, acceptance criteria, out-of-scope |
+| Design (frontend only) | **Designer** | Screens & flows, states, design tokens, accessibility |
 | Plan | **Architect** | Tech stack, file structure, implementation plan |
 | Code | **Developer** | Checks off plan items as files land in `src/` |
 | Review | **Reviewer** | Review verdict and findings; changes loop back to Developer |
 | Test & Fix | **QA** | Test command and results; failures loop back to Developer |
 
-The **Supervisor** owns the `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING` state
-machine and routes work to the right agent. For the full rationale (why split the
+The **Supervisor** owns the `GATHERING_REQS → [DESIGN] → PLANNING → CODING → REVIEW → TESTING` state
+machine and routes work to the right agent. The optional `DESIGN` phase runs only
+for frontend or UI-heavy projects. For the full rationale (why split the
 work, and why Copilot customization over a backend), see
 [Copilot-SDLC-Agent-Design.md](Copilot-SDLC-Agent-Design.md).
 
@@ -48,12 +51,14 @@ Copilot-SDLC-Demo/
 │  ├─ agents/
 │  │  ├─ sdlc-supervisor.agent.md   ← Supervisor: state machine + delegation
 │  │  ├─ pm.agent.md                ← PM worker (subagent)
+│  │  ├─ designer.agent.md          ← Designer worker (subagent, frontend only)
 │  │  ├─ architect.agent.md         ← Architect worker (subagent)
 │  │  ├─ developer.agent.md         ← Developer worker (subagent)
 │  │  ├─ reviewer.agent.md          ← Reviewer worker (subagent)
 │  │  └─ qa.agent.md                ← QA worker (subagent)
 │  ├─ instructions/
 │  │  ├─ coding-standards.instructions.md     ← applyTo source files
+│  │  ├─ frontend-ux.instructions.md          ← applyTo UI source files
 │  │  └─ testing-standards.instructions.md    ← applyTo test files
 │  └─ prompts/
 │     ├─ start-new-feature.prompt.md
@@ -119,8 +124,8 @@ them from a clone of this repo, not an empty folder.
 
 1. Copy these into the root of your repo, preserving paths:
    - `.github/copilot-instructions.md`
-   - `.github/agents/` (all six `.agent.md` files)
-   - `.github/instructions/` (both `.instructions.md` files)
+   - `.github/agents/` (all seven `.agent.md` files)
+   - `.github/instructions/` (all three `.instructions.md` files)
    - `.github/prompts/` (both `.prompt.md` files)
    - `docs/spec.md`
 2. Make sure your repo has `src/` and `tests/` folders (add a `.gitkeep` if empty).
@@ -134,6 +139,9 @@ them from a clone of this repo, not an empty folder.
 - **Coding conventions:** edit
   [.github/instructions/coding-standards.instructions.md](.github/instructions/coding-standards.instructions.md)
   (its `applyTo` controls which files it governs).
+- **Frontend UX & accessibility:** edit
+  [.github/instructions/frontend-ux.instructions.md](.github/instructions/frontend-ux.instructions.md)
+  to match your design system and accessibility target.
 - **Test framework & commands:** edit
   [.github/instructions/testing-standards.instructions.md](.github/instructions/testing-standards.instructions.md).
 - **Default tech stack:** note your preferences in
@@ -143,7 +151,7 @@ them from a clone of this repo, not an empty folder.
 
 [docs/spec.md](docs/spec.md) is the tracked source of truth. For a fresh feature,
 reset its **Current State** to `GATHERING_REQS` and clear the Goal, Requirements,
-Plan, and Test Results sections — the supervisor refills them as it works.
+Design, Plan, and Test Results sections — the supervisor refills them as it works.
 
 ### Optional: full autonomy via GitHub
 
@@ -180,6 +188,7 @@ review and implementation separate.
 |-------|---------|-----|
 | `sdlc-supervisor` | `read, search, edit, todo, agent` | Coordinates only: reads/updates `docs/spec.md` (`edit`), tracks phases (`todo`), and delegates (`agent`). No `execute` — it never runs code itself. |
 | `pm` | `read, edit, search` | Writes requirements into `docs/spec.md`; no code or test execution. |
+| `designer` | `read, edit, search` | Writes the UI/UX design into `docs/spec.md` for frontend projects; no code or test execution. |
 | `architect` | `read, edit, search` | Writes the plan into `docs/spec.md`; no code or test execution. |
 | `developer` | `read, edit, search, execute` | Writes files under `src/` and may run a command to verify a fix. |
 | `reviewer` | `read, search` | Review-only: can read code but **cannot** edit or execute, enforcing the review/implementation split. |

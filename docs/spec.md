@@ -6,7 +6,7 @@
 
 `GATHERING_REQS`
 
-<!-- One of: GATHERING_REQS | PLANNING | CODING | REVIEW | TESTING | DONE -->
+<!-- One of: GATHERING_REQS | DESIGN | PLANNING | CODING | REVIEW | TESTING | DONE -->
 
 ---
 
@@ -31,6 +31,12 @@ _(PM — observable conditions that define "done".)_
 _(PM — explicit non-goals.)_
 
 -
+
+---
+
+## Design
+
+_(Designer — frontend/UI projects only. Screens & flows, screen states (empty/loading/error/success), layout & components, design tokens, accessibility target. Skip for non-UI projects.)_
 
 ---
 
