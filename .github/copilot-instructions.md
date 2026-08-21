@@ -1,14 +1,16 @@
 # Project Guidelines
 
-These rules apply to every agent in this workspace (Supervisor, PM, Architect, Developer, Reviewer, QA).
+These rules apply to every agent in this workspace (Supervisor, PM, Architect, Developer, Reviewer, Security, QA).
 
 ## Workflow
 
 - The project moves through a state machine: `GATHERING_REQS → [DESIGN] → PLANNING → CODING → REVIEW → TESTING → [DEPLOYMENT_READINESS] → DONE`. The `DESIGN` phase is optional (frontend/UI projects only). `DEPLOYMENT_READINESS` is an optional pre-merge gate.
 - [docs/spec.md](../docs/spec.md) is the single source of truth for requirements, plan, and current state. Keep it updated as work progresses.
 - Do not skip ahead: code is only written after requirements are clear and a plan exists.
+- The **Supervisor verifies plan coverage** before leaving PLANNING: every requirement and acceptance criterion must map to at least one Implementation Plan item.
 - The **Developer must verify the project builds cleanly** before handing off to REVIEW.
 - The **Reviewer performs a scope audit** (per `.github/instructions/scope-audit.instructions.md`) to catch cross-domain contamination.
+- The **Security agent performs an AppSec pass** in REVIEW (OWASP Top 10 plus dependency and secret scans); unresolved Critical/High findings route back to the Developer.
 
 ## Code Style
 

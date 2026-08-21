@@ -44,6 +44,7 @@ Splitting the problem into specialized roles produces better, more focused resul
 | **Architect** | Turns finalized requirements into file structure, implementation map, and tech-stack decisions |
 | **Developer** | Writes/edits files, produces clean code |
 | **Reviewer** | Reviews the Developer's code for quality, security, and standards adherence before testing |
+| **Security (AppSec)** | Dedicated application-security pass: OWASP Top 10 assessment plus dependency and secret scans before testing |
 | **QA / Tester** | Writes unit tests, reviews edge cases, runs tests, reports failures |
 
 ### Supervisor / Worker pattern
@@ -91,6 +92,14 @@ State: GATHERING_REQS  →  [DESIGN]  →  PLANNING  →  CODING  →  REVIEW  �
    (back to Developer Agent for a patch)
        │ Approved
        ▼
+┌──────────────────────┐│ Security Agent:      │
+│ AppSec / OWASP Pass  │
+└──────┬───────────────┘
+       │ Critical/High findings
+       ▼
+   (back to Developer Agent for a patch)
+       │ Pass
+       ▼
 ┌──────────────────────┐│ QA Agent:            │
 │ Write & Run Tests    │
 └──────┬───────────────┘
@@ -127,6 +136,7 @@ This maps the multi-agent design onto Copilot's **native** features — no web s
 | **Architect worker** | Subagent for file structure + tech-stack spec |
 | **Developer worker** | Subagent that writes/edits files |
 | **Reviewer worker** | Subagent that reviews code for quality, security, and standards before testing |
+| **Security worker** | Subagent for a dedicated AppSec pass (OWASP Top 10 + dependency/secret scans) before testing |
 | **QA worker** | Subagent that writes tests, runs them, reports failures |
 | **Shared rules** | `.github/copilot-instructions.md` + `.instructions.md` files with conventions all agents obey (an `AGENTS.md` at the repo root is an equivalent alternative this repo does not use) |
 | **State** | Lives in the conversation + a tracked spec/todo file (no database needed) |
@@ -158,6 +168,7 @@ All customization lives in the workspace and is committed alongside the code:
     architect.agent.md           # Architect worker: spec + file structure + stack
     developer.agent.md           # Developer worker: writes/edits files
     reviewer.agent.md            # Reviewer worker: reviews code quality & security
+    security.agent.md            # Security worker: AppSec pass (OWASP Top 10) + dep/secret scans
     qa.agent.md                  # QA worker: writes & runs tests, reports failures
   instructions/
     coding-standards.instructions.md   # applyTo code files
@@ -201,12 +212,16 @@ All customization lives in the workspace and is committed alongside the code:
 - For UI code, checks the implementation against the Design section and the frontend UX & accessibility standards.
 - Checks spec fidelity and maintainability; approves or routes specific change requests back to the Developer via the Supervisor.
 
-### 6.7 QA agent
+### 6.7 Security agent
+- Runs a dedicated application-security pass after the Reviewer approves code quality: static assessment against the OWASP Top 10 plus available dependency, SAST, and secret scans.
+- Read-only for code (no `edit`): classifies findings by severity and routes Critical/High findings back to the Developer via the Supervisor; records results in the spec's **Security Findings** section.
+
+### 6.8 QA agent
 - Writes unit tests and covers edge cases.
 - Runs the test suite in the integrated terminal.
 - Reports failures back so the Supervisor can route to the Developer agent for a patch.
 
-### 6.8 Shared rules & prompts
+### 6.9 Shared rules & prompts
 - `copilot-instructions.md`: conventions every agent obeys (this repo's shared-rules file; an `AGENTS.md` at the repo root is an equivalent alternative).
 - `.instructions.md` files scoped via `applyTo` for coding, frontend UX, and testing standards.
 - `.prompt.md` files for repeatable kickoffs (new feature, fix failing tests).

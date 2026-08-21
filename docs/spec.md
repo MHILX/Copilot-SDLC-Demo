@@ -73,6 +73,12 @@ _(Reviewer — verdict (Approved / Changes requested) and any actionable finding
 
 ---
 
+## Security Findings
+
+_(Security / AppSec — verdict (Pass / Changes requested), OWASP Top 10 assessment, scan results, and any findings with severity (Critical/High/Medium/Low), file, issue, and remediation.)_
+
+---
+
 ## Test Results
 
 _(QA — latest test command, pass/fail counts, and any failures with error output.)_

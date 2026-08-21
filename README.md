@@ -12,6 +12,7 @@ It implements the **Supervisor / Worker** multi-agent pattern described in
    ├── architect   → spec, file structure, tech stack
    ├── developer   → write / edit code
    ├── reviewer    → review code for quality & security
+   ├── security    → dedicated AppSec pass: OWASP Top 10 & dependency scans
    └── qa          → write & run tests, report failures
 ```
 
@@ -56,6 +57,7 @@ rather than running unattended.
 | Plan | **Architect** | Tech stack, file structure, implementation plan |
 | Code | **Developer** | Checks off plan items as files land in `src/`; verifies build |
 | Review | **Reviewer** | Review verdict, scope audit, and findings; changes loop back to Developer |
+| Security _(AppSec)_ | **Security** | OWASP Top 10 assessment and dependency/secret scans; Critical/High findings loop back to Developer |
 | Test & Fix | **QA** | Test command and results; failures loop back to Developer |
 | Deployment Readiness _(optional)_ | **Reviewer** | Pre-deploy checklist: build, tests, secrets, config, deps, cleanup |
 
@@ -82,6 +84,7 @@ Copilot-SDLC-Demo/
 │  │  ├─ architect.agent.md         ← Architect worker (subagent)
 │  │  ├─ developer.agent.md         ← Developer worker (subagent)
 │  │  ├─ reviewer.agent.md          ← Reviewer worker (subagent)
+│  │  ├─ security.agent.md          ← Security / AppSec worker (subagent)
 │  │  └─ qa.agent.md                ← QA worker (subagent)
 │  ├─ instructions/
 │  │  ├─ coding-standards.instructions.md     ← applyTo source files
@@ -182,7 +185,7 @@ npx degit MHILX/Copilot-SDLC-Demo my-project
 
 1. Copy these into the root of your repo, preserving paths:
    - `.github/copilot-instructions.md`
-   - `.github/agents/` (all seven `.agent.md` files)
+   - `.github/agents/` (all eight `.agent.md` files)
    - `.github/instructions/` (all five `.instructions.md` files)
    - `.github/prompts/` (all three `.prompt.md` files)
    - `docs/spec.md` — only if your repo doesn't already have one (it's project-owned state)
