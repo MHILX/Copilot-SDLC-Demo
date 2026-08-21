@@ -133,8 +133,9 @@ files into it:
 ### Quick scaffold (script)
 
 From a clone of this repo, run the script for your shell and point it at a target
-folder. It copies the whole `.github` customization and `docs/spec.md`, then
-ensures `src/` and `tests/` exist:
+folder. Template-owned files (`.github/…`) are (re)copied; `docs/spec.md` is
+seeded once and then preserved as project-owned state; `src/` and `tests/` are
+ensured:
 
 ```powershell
 # Windows / PowerShell
@@ -148,17 +149,43 @@ ensures `src/` and `tests/` exist:
 
 The scripts copy directories wholesale (not a hard-coded file list), so they stay
 correct as agents are added or renamed. They prompt before overwriting existing
-files — pass `-Force` (PowerShell) or `--force` (Bash) to skip the prompts. Run
-them from a clone of this repo, not an empty folder.
+template files — pass `-Force` (PowerShell) or `--force` (Bash) to skip the
+prompts. `docs/spec.md` is never overwritten once it exists, so re-scaffolding an
+active project won't wipe your in-progress workflow state.
+
+### One command (no manual clone)
+
+Install into any project in a single command by pointing the script at the
+template's git URL. It shallow-clones to a temp folder and cleans up afterward:
+
+```powershell
+# Windows / PowerShell
+./scripts/scaffold-sdlc.ps1 -Target ../my-project -FromRepo https://github.com/MHILX/Copilot-SDLC-Demo.git
+```
+
+```bash
+# macOS / Linux / WSL
+./scripts/scaffold-sdlc.sh ../my-project --from-repo https://github.com/MHILX/Copilot-SDLC-Demo.git
+```
+
+### Use this repo as a GitHub template
+
+On GitHub, open **Settings → General → Template repository** and enable it. Then
+anyone can pick **Use this template** to create a new repo pre-loaded with the
+SDLC customization. Locally, `degit` does the same without git history:
+
+```bash
+npx degit MHILX/Copilot-SDLC-Demo my-project
+```
 
 ### Manual copy
 
 1. Copy these into the root of your repo, preserving paths:
    - `.github/copilot-instructions.md`
    - `.github/agents/` (all seven `.agent.md` files)
-   - `.github/instructions/` (all three `.instructions.md` files)
-   - `.github/prompts/` (both `.prompt.md` files)
-   - `docs/spec.md`
+   - `.github/instructions/` (all five `.instructions.md` files)
+   - `.github/prompts/` (all three `.prompt.md` files)
+   - `docs/spec.md` — only if your repo doesn't already have one (it's project-owned state)
 2. Make sure your repo has `src/` and `tests/` folders (add a `.gitkeep` if empty).
 3. Reload the VS Code window so the agents are picked up.
 4. Select **`sdlc-supervisor`** and describe what you want to build.
