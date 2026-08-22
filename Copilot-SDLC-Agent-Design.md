@@ -4,7 +4,7 @@ A design and planning document for orchestrating requirement gathering, planning
 
 > **Status:** Implemented. The customization files described here live in this repo (see [README.md](README.md)).
 > **Chosen approach:** Copilot customization (in-editor, no backend service).
-> **Last updated:** 2026-06-26
+> **Last updated:** 2026-08-21
 
 ---
 
@@ -52,7 +52,7 @@ Splitting the problem into specialized roles produces better, more focused resul
 The user interacts only with the **Supervisor**. The Supervisor tracks overall project **state** and routes the task to the right worker:
 
 ```
-State: GATHERING_REQS  →  [DESIGN]  →  PLANNING  →  CODING  →  REVIEW  →  TESTING  →  (loop back as needed)
+State: GATHERING_REQS  →  [DESIGN]  →  PLANNING  →  CODING  →  REVIEW  →  TESTING  →  [DEPLOYMENT_READINESS]  →  DONE   (loops back as needed)
 ```
 
 `DESIGN` is optional and runs only for frontend or UI-heavy projects; non-UI projects skip from `GATHERING_REQS` straight to `PLANNING`.
@@ -130,7 +130,7 @@ This maps the multi-agent design onto Copilot's **native** features — no web s
 
 | Design concept | Implementation |
 |----------------|----------------|
-| **Supervisor** | A custom agent (`.agent.md`) that owns the state machine (`GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`) and delegates |
+| **Supervisor** | A custom agent (`.agent.md`) that owns the state machine (`GATHERING_REQS → [DESIGN] → PLANNING → CODING → REVIEW → TESTING → [DEPLOYMENT_READINESS] → DONE`) and delegates |
 | **PM worker** | Subagent for requirements / clarifying questions |
 | **Designer worker** | Subagent for UI/UX flows, screen states, and accessibility (frontend projects only) |
 | **Architect worker** | Subagent for file structure + tech-stack spec |
@@ -153,7 +153,7 @@ This maps the multi-agent design onto Copilot's **native** features — no web s
 
 ---
 
-## 5. Proposed File Layout
+## 5. File Layout
 
 All customization lives in the workspace and is committed alongside the code:
 
@@ -171,22 +171,25 @@ All customization lives in the workspace and is committed alongside the code:
     security.agent.md            # Security worker: AppSec pass (OWASP Top 10) + dep/secret scans
     qa.agent.md                  # QA worker: writes & runs tests, reports failures
   instructions/
-    coding-standards.instructions.md   # applyTo code files
-    frontend-ux.instructions.md        # applyTo UI source files
-    testing-standards.instructions.md  # applyTo test files
+    coding-standards.instructions.md      # applyTo source files
+    frontend-ux.instructions.md           # applyTo UI source files
+    testing-standards.instructions.md     # applyTo test files
+    scope-audit.instructions.md           # blast-radius checker (declare → implement → verify)
+    deployment-readiness.instructions.md  # pre-deploy security & build checklist
   prompts/
     start-new-feature.prompt.md  # Repeatable kickoff
     fix-failing-tests.prompt.md  # Repeatable test/fix kickoff
+    handoff.prompt.md            # Agent-to-agent orientation prompt
 ```
 
-> Exact folder conventions (e.g., `.github/agents` vs. workspace-level) will be confirmed at implementation time against the current VS Code Copilot customization docs.
+> These folder conventions are implemented in this repo; [README.md](README.md) has the authoritative file list.
 
 ---
 
 ## 6. Components to Build
 
 ### 6.1 Supervisor agent
-- Owns the state machine: `GATHERING_REQS → PLANNING → CODING → REVIEW → TESTING`.
+- Owns the state machine: `GATHERING_REQS → [DESIGN] → PLANNING → CODING → REVIEW → TESTING → [DEPLOYMENT_READINESS] → DONE`.
 - Decides which worker to delegate to based on current state and user input.
 - Maintains a tracked spec/todo file as the source of truth for project state.
 

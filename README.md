@@ -150,11 +150,14 @@ ensured:
 ./scripts/scaffold-sdlc.sh ../my-project
 ```
 
-The scripts copy directories wholesale (not a hard-coded file list), so they stay
-correct as agents are added or renamed. They prompt before overwriting existing
-template files — pass `-Force` (PowerShell) or `--force` (Bash) to skip the
-prompts. `docs/spec.md` is never overwritten once it exists, so re-scaffolding an
-active project won't wipe your in-progress workflow state.
+The scripts sync every file under the template folders (not a hard-coded list), so
+newly added agents are picked up and ones you rename or remove upstream are cleaned
+from the target on the next run — while any files you add to those folders yourself
+are preserved (they track what they installed in `.github/.sdlc-manifest`). They
+prompt before overwriting existing template files — pass `-Force` (PowerShell) or
+`--force` (Bash) to skip the prompts. `docs/spec.md` is never overwritten once it
+exists, so re-scaffolding an active project won't wipe your in-progress workflow
+state.
 
 ### One command (no manual clone)
 
